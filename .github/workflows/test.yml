@@ -2,7 +2,9 @@ name: Browser- und Tablet-Prüfung
 on:
   push:
     branches: [main]
+    paths: ['index.html', 'tests/**', '.github/workflows/test.yml']
   pull_request:
+    paths: ['index.html', 'tests/**', '.github/workflows/test.yml']
   workflow_dispatch:
 permissions:
   contents: read
