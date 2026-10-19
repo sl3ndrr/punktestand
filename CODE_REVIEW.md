@@ -31,6 +31,10 @@ Diese Erweiterungen sind bewusst nicht Bestandteil der Tablet-Anpassung.
 
 ## Prüfgrenzen
 
-Die JavaScript-Syntax sowie Ganzzahlprüfung, Überlaufprüfung, Wertung und Prüfung beschädigter Speicherdaten wurden lokal geprüft. Ein wiederholbarer Chromium-Browsertest liegt unter `tests/browser.cjs` und wird durch GitHub Actions gestartet. Im Lauf [39328184630](https://github.com/sl3ndrr/punktestand/actions/runs/39328184630) bestanden Bedienung, Speicherung, Tastaturfokus, Eingabeprüfung und alle 56 Layout-Kombinationen. Anschließend wurden anhand der Screenshots die Namen in schmalen Karten und die Safe-Area-Abstände verbessert; diese Änderungen werden erneut geprüft.
+Die JavaScript-Syntax sowie Ganzzahlprüfung, Überlaufprüfung, Wertung und Prüfung beschädigter Speicherdaten wurden lokal geprüft. Ein wiederholbarer Chromium-Browsertest liegt unter `tests/browser.cjs` und wird durch GitHub Actions gestartet. Im abschließenden Lauf [39328871416](https://github.com/sl3ndrr/punktestand/actions/runs/39328871416) bestanden Bedienung, Speicherung, Tastaturfokus, Eingabeprüfung und alle 63 Layout-Kombinationen. Dabei wurden auch abgeschnittene Standardnamen, überlappende Bedienelemente und horizontale Überläufe ausgeschlossen. Die 11-Zoll-Testgrößen 820×1180, 834×1194, 1180×820, 1194×834 und 1280×800 zeigen alle 2–8 Spieler ohne vertikalen Seitenüberlauf. Die erzeugten Screenshots wurden zusätzlich visuell geprüft.
 
 Die Screenshots ersetzen keine Prüfung auf einem physischen iPad oder Android-Tablet, insbesondere mit Bildschirmtastatur, Safari-Browserleisten, Zoom und Safe Areas.
+
+## Veröffentlichung
+
+Die fertige Anwendung liegt als `index.html` auf `main`; `.nojekyll` ist vorhanden. Die erstmalige Pages-Aktivierung konnte über die verfügbare GitHub-Anbindung nicht vorgenommen werden, weil diese keine Pages-Einstellungen anbietet. Der direkte Zugriff auf die GitHub-Einstellungen war in der Arbeitsumgebung durch eine Netzsperre blockiert. Deshalb ist die Veröffentlichung noch nicht als live bestätigt. Die einmalige Auswahl **Settings → Pages → Deploy from a branch → main → /(root) → Save** ist in der README beschrieben.
