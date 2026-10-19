@@ -8,6 +8,7 @@ Ausgangspunkt: hochgeladene Datei `punktestand (3).html`. Die bestehende Anwendu
 | --- | --- |
 | Feste Breite von 1100 Pixeln; Kartenraster berücksichtigte nur Mindestbreiten | Mehr nutzbare Breite und Raster nach Spielerzahl; separate Anordnung von Punktzahl und großen Tasten auf Tablets |
 | Große Punktzahlen konnten zwischen den Tasten abgeschnitten werden | Schriftgröße berücksichtigt Kartenbreite und Stellenzahl |
+| In dichten Rastern konkurrierten Name, Status und Entfernen-Taste um eine Zeile | Schmale Karten zeigen den Namen in einer eigenen Zeile |
 | `parseInt` änderte beispielsweise 1,9 stillschweigend zu 1 | Nur sichere ganze Zahlen werden angewendet; ungültige Eingaben erhalten einen Hinweis |
 | Gespeicherte Daten wurden lediglich auf ein Spieler-Array geprüft | Prüfung von Spielerzahl, eindeutigen IDs, Punktzahlen, Namen, Farben und Verlaufswerten vor der Verwendung |
 | Speicherfehler wurden vollständig verschwiegen | Sichtbarer Hinweis, wenn der Spielstand nicht gespeichert werden kann |
@@ -30,4 +31,6 @@ Diese Erweiterungen sind bewusst nicht Bestandteil der Tablet-Anpassung.
 
 ## Prüfgrenzen
 
-Die JavaScript-Syntax wird lokal geprüft. Ein wiederholbarer Chromium-Browsertest liegt unter `tests/browser.cjs` und wird durch GitHub Actions gestartet. Ein erfolgreich konfigurierter Test ist noch kein erfolgreicher Testlauf; der Laufstatus ist unter **Actions** zu prüfen. Die Screenshots ersetzen keine Prüfung auf einem physischen iPad oder Android-Tablet, insbesondere mit Bildschirmtastatur, Safari-Browserleisten, Zoom und Safe Areas.
+Die JavaScript-Syntax sowie Ganzzahlprüfung, Überlaufprüfung, Wertung und Prüfung beschädigter Speicherdaten wurden lokal geprüft. Ein wiederholbarer Chromium-Browsertest liegt unter `tests/browser.cjs` und wird durch GitHub Actions gestartet. Im Lauf [39328184630](https://github.com/sl3ndrr/punktestand/actions/runs/39328184630) bestanden Bedienung, Speicherung, Tastaturfokus, Eingabeprüfung und alle 56 Layout-Kombinationen. Anschließend wurden anhand der Screenshots die Namen in schmalen Karten und die Safe-Area-Abstände verbessert; diese Änderungen werden erneut geprüft.
+
+Die Screenshots ersetzen keine Prüfung auf einem physischen iPad oder Android-Tablet, insbesondere mit Bildschirmtastatur, Safari-Browserleisten, Zoom und Safe Areas.

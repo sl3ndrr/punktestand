@@ -10,7 +10,7 @@ const server = createServer((req,res) => {
   res.end(html);
 });
 const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) =>
-  ({id:'pTest'+i, name:'Spieler '+(i+1), score:i === 0 ? -1234 : 999, amt:'', c:'#4f8cff'}))});
+  ({id:'pTest'+i, name:'Spieler '+(i+1), score:i === 0 ? -1234 : 999, amt:'', c:['#4f8cff','#ff7a59','#2fb67c','#b072f0','#e0a410','#e85d9a','#22b5c8','#8a94a6'][i]}))});
 
 (async () => {
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
@@ -83,6 +83,11 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
           width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,
           scrollHeight:document.documentElement.scrollHeight,
           clipped:[...document.querySelectorAll('.score')].filter(el => el.scrollWidth > el.clientWidth + 1).length,
+          clippedNames:[...document.querySelectorAll('.name')].filter(el => {
+            const style=getComputedStyle(el),ctx=document.createElement('canvas').getContext('2d');
+            ctx.font=style.font;
+            return ctx.measureText(el.value).width > el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) + 1;
+          }).length,
           overlap:[...document.querySelectorAll('.main')].filter(el => {
             const score=el.querySelector('.score').getBoundingClientRect(),main=el.getBoundingClientRect(),button=el.querySelector('.round').getBoundingClientRect();
             return score.top < main.top - 1 || score.bottom > main.bottom + 1 || (innerWidth >= 700 && score.bottom > button.top + 1);
@@ -92,6 +97,7 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
         }));
         assert.ok(metrics.scrollWidth <= width,`Horizontal overflow ${width}×${height}, ${count} players`);
         assert.equal(metrics.clipped,0,`Clipped score ${width}×${height}, ${count} players`);
+        assert.equal(metrics.clippedNames,0,`Clipped player name ${width}×${height}, ${count} players`);
         assert.equal(metrics.overlap,0,`Overlapping score ${width}×${height}, ${count} players`);
         assert.equal(metrics.smallTargets,0,`Small scoring button ${width}×${height}, ${count} players`);
         // 11-inch tablets should show every player without page scrolling.
