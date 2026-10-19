@@ -28,7 +28,7 @@ Ab 700 CSS-Pixeln werden Karten und Bedienelemente an die Spielerzahl angepasst.
 
 ## Prüfung
 
-Der GitHub-Actions-Workflow prüft Bedienung, Speicherung, fehlerhafte Daten, Tastaturfokus und 56 Layout-Kombinationen einschließlich 820×1180, 834×1194 sowie der jeweiligen Querformate. Screenshots und Messwerte liegen nach einem erfolgreichen Lauf im Actions-Artefakt `tablet-pruefung`.
+Der GitHub-Actions-Workflow prüft Bedienung, Speicherung, fehlerhafte Daten, Tastaturfokus und 63 Layout-Kombinationen einschließlich 820×1180, 834×1194, der jeweiligen Querformate und 1280×800. Screenshots und Messwerte liegen nach einem erfolgreichen Lauf im Actions-Artefakt `tablet-pruefung`.
 
 Lokal mit Node.js 24:
 

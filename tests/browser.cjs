@@ -74,7 +74,7 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
     }
     const samples = [];
     mkdirSync('test-results',{recursive:true});
-    for (const [width,height] of [[390,844],[768,1024],[820,1180],[834,1194],[1024,768],[1180,820],[1194,834],[1920,1080]]) {
+    for (const [width,height] of [[390,844],[768,1024],[820,1180],[834,1194],[1024,768],[1180,820],[1194,834],[1280,800],[1920,1080]]) {
       await page.setViewportSize({width,height});
       for (const count of [2,3,4,5,6,7,8]) {
         await page.evaluate(data => localStorage.setItem('punktestand-v1',JSON.stringify(data)),fixture(count));
@@ -101,7 +101,7 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
         assert.equal(metrics.overlap,0,`Overlapping score ${width}×${height}, ${count} players`);
         assert.equal(metrics.smallTargets,0,`Small scoring button ${width}×${height}, ${count} players`);
         // 11-inch tablets should show every player without page scrolling.
-        if ([820,834,1180,1194].includes(width)) assert.ok(metrics.scrollHeight <= height + 1,`Vertical overflow ${width}×${height}, ${count} players: ${metrics.scrollHeight}`);
+        if ([820,834,1180,1194,1280].includes(width)) assert.ok(metrics.scrollHeight <= height + 1,`Vertical overflow ${width}×${height}, ${count} players: ${metrics.scrollHeight}`);
         samples.push({count,...metrics});
         if ([834,1194].includes(width) && [2,4,8].includes(count)) await page.screenshot({path:`test-results/${width}x${height}-${count}-players.png`,fullPage:true});
       }
