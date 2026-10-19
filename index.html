@@ -20,7 +20,7 @@ button{cursor:pointer;border:0;background:var(--btn);border-radius:14px;touch-ac
 button:hover{background:var(--btn-h)}
 button:active{transform:scale(.95)}
 :focus-visible{outline:2px solid var(--c,#4f8cff);outline-offset:2px}
-.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 32px;display:flex;flex-direction:column;gap:14px;min-height:100dvh}
+.wrap{max-width:1800px;margin:0 auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:14px;min-height:100dvh}
 .bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .bar h1{font-size:1.15rem;font-weight:650;margin:0 auto 0 4px;letter-spacing:-.01em}
 .seg{display:flex;background:var(--btn);border-radius:12px;padding:3px}
@@ -33,7 +33,7 @@ button:active{transform:scale(.95)}
 .diff .t{color:var(--muted);font-size:.95rem}
 .diff .t b{color:var(--text);font-weight:600}
 #app{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;flex:1;align-content:stretch}
-.card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--c)}
+.card{min-width:0;container-type:inline-size;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--c)}
 .head{display:flex;align-items:center;gap:8px}
 .name{flex:1;min-width:0;background:none;border:0;font-size:1.1rem;font-weight:600;padding:6px 4px;border-radius:8px}
 .name:hover{background:var(--btn)}
@@ -42,7 +42,7 @@ button:active{transform:scale(.95)}
 .badge.lead{background:var(--c);color:#fff}
 .main{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:1;min-height:130px}
 .round{width:clamp(56px,16vw,78px);height:clamp(56px,16vw,78px);border-radius:50%;font-size:2rem;padding:0;flex:none;line-height:1}
-.score{font-size:clamp(4.5rem,15vw,8rem);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.04em;text-align:center;line-height:1;min-width:0;overflow:hidden;text-overflow:clip}
+.score{font-size:clamp(1rem,calc(70cqi / var(--digits,3)),8rem);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.04em;text-align:center;line-height:1;min-width:0;overflow:hidden;text-overflow:clip}
 .custom{display:flex;gap:8px}
 .custom input{flex:1;min-width:0;background:var(--btn);border:0;border-radius:14px;padding:0 14px;height:52px;font-size:1.15rem;text-align:center;font-variant-numeric:tabular-nums}
 .custom input::placeholder{color:var(--muted)}
@@ -50,7 +50,29 @@ button:active{transform:scale(.95)}
 .add{background:none;border:2px dashed var(--line);color:var(--muted);padding:14px;font-size:.95rem;border-radius:20px}
 .add:hover{background:var(--btn)}
 .add:disabled{opacity:.4;cursor:default}
-@media (min-width:700px) and (orientation:landscape){.wrap{padding:24px 28px 36px}.main{min-height:180px}}
+/* Tablets: Anzahl der Karten statt einer festen Mindestbreite entscheidet. */
+@media (min-width:700px){
+  .wrap{padding:20px clamp(16px,2vw,32px) 20px;gap:12px}
+  #app{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  #app[data-count="3"] .card:last-child{grid-column:1 / -1}
+  #app[data-count="7"],#app[data-count="8"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .card{padding:12px 14px 14px;gap:10px}
+  .main{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) auto;gap:10px;min-height:140px}
+  .score{grid-column:1 / -1;grid-row:1;font-size:clamp(1rem,calc(145cqi / var(--digits,3)),16rem)}
+  .round{grid-row:2;width:clamp(56px,23cqi,104px);height:auto;aspect-ratio:1;font-size:clamp(2rem,9cqi,3rem)}
+  .round:last-child{justify-self:end}
+  .custom input,.custom button{height:48px}
+  .custom button{width:clamp(48px,20cqi,72px);flex:none}
+  .name{font-size:1rem}
+}
+@media (min-width:1000px){
+  #app[data-count="3"],#app[data-count="5"],#app[data-count="6"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #app[data-count="3"] .card:last-child{grid-column:auto}
+}
+@media (min-width:1100px){
+  #app[data-count="7"],#app[data-count="8"]{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+.notice{margin:0;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
 .theme{position:relative;width:58px;height:34px;padding:0 9px;border-radius:99px;display:flex;align-items:center;justify-content:space-between;color:var(--muted)}
 .theme svg{width:16px;height:16px;position:relative;z-index:1;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:color .25s}
 .theme[aria-checked="false"] .sun,.theme[aria-checked="true"] .moon{color:var(--text)}
@@ -123,6 +145,7 @@ body,.card,.diff,.seg,.seg button,button{transition:background-color .3s,color .
     </button>
   </div>
   <div class="diff" id="diff"></div>
+  <p class="notice" id="notice" role="status" hidden></p>
   <div id="app"></div>
   <button class="add" id="addp" data-a="addp">+ Spieler hinzufügen</button>
 </div>
@@ -137,10 +160,24 @@ let S = null, hist = [];
 
 function mk(name, i){ return { id: 'p' + Date.now().toString(36) + i + Math.floor(Math.random()*1000), name, score: 0, amt: '', c: COLORS[i % COLORS.length] }; }
 function load(){
-  try { const r = localStorage.getItem(KEY); if (r) { const d = JSON.parse(r); if (d && Array.isArray(d.players) && d.players.length >= 2) return d; } } catch (e) {}
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY));
+    if (!d || !Array.isArray(d.players) || d.players.length < 2 || d.players.length > MAX) return null;
+    const ids = new Set();
+    const players = d.players.map((p, i) => {
+      if (!p || typeof p.id !== 'string' || !/^p[a-zA-Z0-9-]+$/.test(p.id) || ids.has(p.id) || !Number.isSafeInteger(p.score)) throw new Error('Ungültiger Spielstand');
+      ids.add(p.id);
+      return {id:p.id,name:typeof p.name === 'string' ? p.name.slice(0,20) || 'Spieler' : 'Spieler',score:p.score,
+        amt:typeof p.amt === 'string' && /^\d*$/.test(p.amt) ? p.amt : '',c:COLORS.includes(p.c) ? p.c : COLORS[i]};
+    });
+    const log = Array.isArray(d.log) ? d.log.slice(-2000).filter(m => m && typeof m === 'object').map(m =>
+      Object.fromEntries(players.filter(p => Number.isSafeInteger(m[p.id])).map(p => [p.id,m[p.id]]))) : [];
+    return {mode:d.mode === 'high' ? 'high' : 'low',players,log,theme:['light','dark'].includes(d.theme) ? d.theme : undefined};
+  } catch (e) {}
   return null;
 }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function notice(message){ $('notice').textContent = message; $('notice').hidden = !message; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { notice('Dieser Browser kann den Spielstand nicht speichern. Bitte die Seite während der Runde geöffnet lassen.'); } }
 S = load() || { mode: 'low', players: [mk('Spieler 1', 0), mk('Spieler 2', 1)] };
 function logPush(){ const m = {}; S.players.forEach(x => m[x.id] = x.score); S.log.push(m); if (S.log.length > 2000) S.log.shift(); }
 if (!Array.isArray(S.log) || !S.log.length) { S.log = []; logPush(); }
@@ -153,7 +190,10 @@ function snap(){
   const m = {}; S.players.forEach(p => m[p.id] = p.score);
   hist.push({ t: 's', m }); if (hist.length > 100) hist.shift();
 }
-function change(p, d){ snap(); p.score += d; logPush(); save(); render(); }
+function change(p, d){
+  if (!Number.isSafeInteger(d) || !Number.isSafeInteger(p.score + d)) { notice('Diese Punktzahl ist zu groß. Bitte einen kleineren Wert eingeben.'); return false; }
+  snap(); p.score += d; logPush(); notice(''); save(); render(); return true;
+}
 
 function standings(){
   const low = S.mode === 'low';
@@ -162,8 +202,11 @@ function standings(){
 }
 
 function render(){
+  const active = document.activeElement, activeCard = active?.closest('.card');
+  const focus = activeCard ? {id:activeCard.dataset.id,a:active.dataset.a,d:active.dataset.d,s:active.dataset.s,f:active.dataset.f} : null;
   const { sorted, best } = standings();
   const leaders = S.players.filter(p => p.score === best);
+  $('app').dataset.count = S.players.length;
   $('app').innerHTML = S.players.map(p => {
     const gap = Math.abs(p.score - best);
     const badge = p.score === best
@@ -177,12 +220,12 @@ function render(){
       </div>
       <div class="main">
         <button class="round" data-a="step" data-d="-1" aria-label="Minus 1">\u2212</button>
-        <div class="score" aria-live="polite">${fmt(p.score)}</div>
+        <div class="score" style="--digits:${Math.max(3,fmt(p.score).length)}" aria-live="polite">${fmt(p.score)}</div>
         <button class="round" data-a="step" data-d="1" aria-label="Plus 1">+</button>
       </div>
       <div class="custom">
         <button data-a="apply" data-s="-1" aria-label="Wert abziehen">\u2212</button>
-        <input type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="Wert" value="${esc(p.amt)}" data-f="amt" aria-label="Wert zum Addieren oder Abziehen">
+        <input type="number" inputmode="numeric" min="0" step="1" placeholder="Wert" value="${esc(p.amt)}" data-f="amt" aria-label="Wert zum Addieren oder Abziehen">
         <button data-a="apply" data-s="1" aria-label="Wert addieren">+</button>
       </div>
     </section>`;
@@ -200,12 +243,21 @@ function render(){
   document.querySelectorAll('[data-a="mode"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === S.mode)));
   $('undo').disabled = hist.length === 0;
   $('addp').disabled = S.players.length >= MAX;
+  if (focus) {
+    const card = [...$('app').children].find(c => c.dataset.id === focus.id);
+    const next = card && [...card.querySelectorAll('button,input')].find(el =>
+      el.dataset.a === focus.a && el.dataset.d === focus.d && el.dataset.s === focus.s && el.dataset.f === focus.f);
+    next?.focus({preventScroll:true});
+  }
   animate();
 }
 
 function apply(p, sign){
-  const v = Math.abs(parseInt(p.amt, 10));
-  if (!isFinite(v) || v === 0) return;
+  if (!p.amt.trim()) return;
+  const v = Math.abs(Number(p.amt));
+  if (!Number.isSafeInteger(v)) { notice('Bitte eine ganze Zahl eingeben.'); return; }
+  if (v === 0) return;
+  if (!Number.isSafeInteger(p.score + sign * v)) { notice('Diese Punktzahl ist zu groß. Bitte einen kleineren Wert eingeben.'); return; }
   p.amt = '';
   change(p, sign * v);
 }
@@ -218,10 +270,9 @@ document.addEventListener('click', e => {
   if (a === 'step' && p) change(p, +b.dataset.d);
   else if (a === 'apply' && p) apply(p, +b.dataset.s);
   else if (a === 'del' && p) {
-    if (card.classList.contains('leaving')) return;
+    if (S.players.length <= 2) return;
     hist.push({ t: 'd', p: { ...p }, i: S.players.indexOf(p) });
-    card.classList.add('leaving');
-    setTimeout(() => { S.players = S.players.filter(x => x !== p); save(); render(); }, rm() ? 0 : 220);
+    S.players = S.players.filter(x => x !== p); save(); render(); $('addp').focus({preventScroll:true});
   }
   else if (a === 'addp') {
     if (S.players.length < MAX) {
@@ -263,6 +314,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* Ergebnis */
+let resultFocus = null, previousOverflow = '';
 function chartSVG(){
   const L = S.log, n = L.length;
   if (n < 2) return '<p class="empty">Noch keine Punkte erfasst.</p>';
@@ -304,15 +356,34 @@ function showResult(){
     <div class="acts"><button data-a="close">Weiterspielen</button><button class="primary" data-a="newgame">Neue Runde starten</button></div>
   </div>`;
   $('ov').hidden = false;
+  resultFocus = document.activeElement;
+  previousOverflow = document.body.style.overflow;
+  document.querySelector('.wrap').inert = true;
+  document.body.style.overflow = 'hidden';
+  $('ov').querySelector('[data-a="close"]').focus();
 }
-function closeResult(){ $('ov').hidden = true; $('ov').innerHTML = ''; }
+function closeResult(){
+  if ($('ov').hidden) return;
+  $('ov').hidden = true; $('ov').innerHTML = '';
+  document.querySelector('.wrap').inert = false;
+  document.body.style.overflow = previousOverflow;
+  if (resultFocus?.isConnected) resultFocus.focus({preventScroll:true});
+}
 function newGame(){
   S.players.forEach(x => { x.score = 0; x.amt = ''; });
   S.log = []; logPush(); hist = [];
   save(); closeResult(); render();
 }
 $('ov').addEventListener('click', e => { if (e.target === $('ov')) closeResult(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('ov').hidden) closeResult(); });
+document.addEventListener('keydown', e => {
+  if ($('ov').hidden) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeResult(); }
+  if (e.key === 'Tab') {
+    const buttons = $('ov').querySelectorAll('button'), first = buttons[0], last = buttons[buttons.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
 
 /* Animationen */
 const rm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -352,8 +423,9 @@ const fsOn = () => !!(document.fullscreenElement || document.webkitFullscreenEle
 const fsOk = !!((document.fullscreenEnabled || document.webkitFullscreenEnabled) && (root.requestFullscreen || root.webkitRequestFullscreen));
 function toggleFs(){
   try {
-    if (fsOn()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-    else (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    const result = fsOn() ? (document.exitFullscreen || document.webkitExitFullscreen).call(document)
+      : (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    if (result?.catch) result.catch(() => notice('Vollbild ist in diesem Browser gerade nicht verfügbar.'));
   } catch (e) {}
 }
 function updateFs(){ $('fs').textContent = fsOn() ? 'Vollbild beenden' : 'Vollbild'; }
