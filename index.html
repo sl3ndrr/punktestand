@@ -57,9 +57,9 @@ button:active{transform:scale(.95)}
   #app[data-count="3"] .card:last-child{grid-column:1 / -1}
   #app[data-count="7"],#app[data-count="8"]{grid-template-columns:repeat(3,minmax(0,1fr))}
   .card{padding:12px 14px 14px;gap:10px}
-  .main{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) auto;gap:10px;min-height:140px}
-  .score{grid-column:1 / -1;grid-row:1;font-size:clamp(1rem,calc(145cqi / var(--digits,3)),16rem)}
-  .round{grid-row:2;width:clamp(56px,23cqi,104px);height:auto;aspect-ratio:1;font-size:clamp(2rem,9cqi,3rem)}
+  .main{container-type:size;--step-size:clamp(56px,min(23cqi,28cqh),104px);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) auto;gap:10px;min-height:140px}
+  .score{grid-column:1 / -1;grid-row:1;font-size:clamp(1rem,min(calc(145cqi / var(--digits,3)),calc(100cqh - var(--step-size) - 10px)),16rem)}
+  .round{grid-row:2;width:var(--step-size);height:auto;aspect-ratio:1;font-size:clamp(2rem,9cqi,3rem)}
   .round:last-child{justify-self:end}
   .custom input,.custom button{height:48px}
   .custom button{width:clamp(48px,20cqi,72px);flex:none}

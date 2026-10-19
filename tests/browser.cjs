@@ -83,11 +83,16 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
           width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,
           scrollHeight:document.documentElement.scrollHeight,
           clipped:[...document.querySelectorAll('.score')].filter(el => el.scrollWidth > el.clientWidth + 1).length,
+          overlap:[...document.querySelectorAll('.main')].filter(el => {
+            const score=el.querySelector('.score').getBoundingClientRect(),main=el.getBoundingClientRect(),button=el.querySelector('.round').getBoundingClientRect();
+            return score.top < main.top - 1 || score.bottom > main.bottom + 1 || (innerWidth >= 700 && score.bottom > button.top + 1);
+          }).length,
           smallTargets:[...document.querySelectorAll('.round,.custom button')].filter(el => el.getBoundingClientRect().width < 44 || el.getBoundingClientRect().height < 44).length,
           columns:getComputedStyle(document.querySelector('#app')).gridTemplateColumns,
         }));
         assert.ok(metrics.scrollWidth <= width,`Horizontal overflow ${width}×${height}, ${count} players`);
         assert.equal(metrics.clipped,0,`Clipped score ${width}×${height}, ${count} players`);
+        assert.equal(metrics.overlap,0,`Overlapping score ${width}×${height}, ${count} players`);
         assert.equal(metrics.smallTargets,0,`Small scoring button ${width}×${height}, ${count} players`);
         // 11-inch tablets should show every player without page scrolling.
         if ([820,834,1180,1194].includes(width)) assert.ok(metrics.scrollHeight <= height + 1,`Vertical overflow ${width}×${height}, ${count} players: ${metrics.scrollHeight}`);
@@ -104,6 +109,10 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
     assert.deepEqual(errors,[]);
     require('node:fs').writeFileSync('test-results/layout.json',JSON.stringify(samples,null,2));
     console.log(`OK: functions, keyboard focus, persistence, validation, ${samples.length} layouts.`);
+  } catch(error) {
+    mkdirSync('test-results',{recursive:true});
+    await page.screenshot({path:'test-results/failure.png',fullPage:true});
+    throw error;
   } finally {
     await browser.close();
     server.close();
