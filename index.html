@@ -96,7 +96,24 @@ body,.card,.diff,.seg,.seg button,button{transition:background-color .3s,color .
 .ov{position:fixed;inset:0;z-index:20;background:rgba(10,11,14,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;animation:fade .25s ease-out}
 .ov[hidden]{display:none}
 .sheet{background:var(--card);color:var(--text);width:min(100%,620px);max-height:94dvh;overflow:auto;border-radius:28px 28px 0 0;padding:26px 20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:20px;animation:sheet .45s cubic-bezier(.2,.8,.2,1)}
-@media (min-width:700px){.ov{align-items:center;padding:24px}.sheet{border-radius:28px;padding-bottom:22px}}
+.result-ranking,.result-history{min-width:0}
+.result-chart{width:100%;aspect-ratio:8 / 5}
+@media (min-width:700px){
+  .sheet{width:100%;height:100dvh;max-height:100dvh;border-radius:0;padding:max(20px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,1.6fr);grid-template-rows:auto minmax(0,1fr) auto;gap:24px}
+  .win{grid-column:1 / -1}
+  .result-ranking{min-height:0;overflow:auto}
+  .result-history{display:flex;flex-direction:column;min-height:220px}
+  .result-chart{flex:1;min-height:0;aspect-ratio:auto}
+  .acts{grid-column:1 / -1}
+  .acts button{flex:none;min-width:200px}
+  .acts{justify-content:flex-end}
+}
+@media (min-width:1000px){
+  .sheet{grid-template-columns:minmax(280px,1fr) minmax(0,2fr)}
+  .win{grid-column:1;grid-row:1}
+  .result-ranking{grid-column:1;grid-row:2}
+  .result-history{grid-column:2;grid-row:1 / 3}
+}
 .win{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
 .crown{width:64px;height:64px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;animation:pop .6s .15s both}
 .crown svg{width:32px;height:32px;fill:currentColor}
@@ -112,7 +129,7 @@ body,.card,.diff,.seg,.seg button,button{transition:background-color .3s,color .
 .rank .dot{width:12px;height:12px;border-radius:50%;background:var(--c);flex:none}
 .rank .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
 .rank .sc{font-weight:700;font-variant-numeric:tabular-nums}
-.chart{width:100%;height:auto;display:block;overflow:visible}
+.chart{width:100%;height:100%;display:block;overflow:visible}
 .gl{stroke:var(--line);stroke-width:1}
 .tx{fill:var(--muted);font-size:14px;font-family:inherit}
 .ln{fill:none;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.1s cubic-bezier(.3,.6,.2,1) forwards}
@@ -239,7 +256,7 @@ function render(){
       </div>
       <div class="custom">
         <button data-a="apply" data-s="-1" aria-label="Wert abziehen">\u2212</button>
-        <input type="number" inputmode="numeric" min="0" step="1" placeholder="Wert" value="${esc(p.amt)}" data-f="amt" aria-label="Wert zum Addieren oder Abziehen">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" placeholder="Wert" value="${esc(p.amt)}" data-f="amt" aria-label="Wert zum Addieren oder Abziehen">
         <button data-a="apply" data-s="1" aria-label="Wert addieren">+</button>
       </div>
     </section>`;
@@ -269,7 +286,7 @@ function render(){
 function apply(p, sign){
   if (!p.amt.trim()) return;
   const v = Math.abs(Number(p.amt));
-  if (!Number.isSafeInteger(v)) { notice('Bitte eine ganze Zahl eingeben.'); return; }
+  if (!/^\d+$/.test(p.amt.trim()) || !Number.isSafeInteger(v)) { notice('Bitte eine ganze Zahl eingeben.'); return; }
   if (v === 0) return;
   if (!Number.isSafeInteger(p.score + sign * v)) { notice('Diese Punktzahl ist zu groß. Bitte einen kleineren Wert eingeben.'); return; }
   p.amt = '';
@@ -329,10 +346,10 @@ document.addEventListener('keydown', e => {
 
 /* Ergebnis */
 let resultFocus = null, previousOverflow = '';
-function chartSVG(){
+function chartSVG(W = 480, H = 300){
   const L = S.log, n = L.length;
   if (n < 2) return '<p class="empty">Noch keine Punkte erfasst.</p>';
-  const W = 480, H = 300, ml = 40, mr = 16, mt = 14, mb = 30;
+  const ml = 40, mr = 16, mt = 14, mb = 30;
   let lo = Infinity, hi = -Infinity;
   S.players.forEach(p => L.forEach(m => { const v = m[p.id]; if (v !== undefined) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }));
   if (hi === lo) { hi += 1; lo -= 1; }
@@ -350,6 +367,12 @@ function chartSVG(){
   });
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Punkteverlauf">${g}</svg>`;
 }
+const resultChartObserver = new ResizeObserver(entries => {
+  for (const {target, contentRect} of entries) {
+    const width = Math.round(contentRect.width), height = Math.round(contentRect.height);
+    if (width > 0 && height > 0) target.innerHTML = chartSVG(width, height);
+  }
+});
 function showResult(){
   const { sorted, best } = standings();
   const win = S.players.filter(p => p.score === best), tie = win.length > 1;
@@ -365,11 +388,12 @@ function showResult(){
       <h2>${win.map(p => esc(p.name)).join(' &amp; ')}</h2>
       <p>${tie ? 'je ' : 'mit '}${fmt(best)} ${pts}</p>
     </div>
-    <div><p class="sec">Endstand</p><ol class="rank">${rows}</ol></div>
-    <div><p class="sec">Punkteverlauf</p>${chartSVG()}</div>
+    <div class="result-ranking"><p class="sec">Endstand</p><ol class="rank">${rows}</ol></div>
+    <div class="result-history"><p class="sec">Punkteverlauf</p><div class="result-chart">${chartSVG()}</div></div>
     <div class="acts"><button data-a="close">Weiterspielen</button><button class="primary" data-a="newgame">Neue Runde starten</button></div>
   </div>`;
   $('ov').hidden = false;
+  resultChartObserver.observe($('ov').querySelector('.result-chart'));
   resultFocus = document.activeElement;
   previousOverflow = document.body.style.overflow;
   document.querySelector('.wrap').inert = true;
@@ -378,6 +402,7 @@ function showResult(){
 }
 function closeResult(){
   if ($('ov').hidden) return;
+  resultChartObserver.disconnect();
   $('ov').hidden = true; $('ov').innerHTML = '';
   document.querySelector('.wrap').inert = false;
   document.body.style.overflow = previousOverflow;

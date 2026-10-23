@@ -23,6 +23,8 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
   try {
     await page.goto(url);
     assert.equal(await page.locator('.card').count(),2);
+    assert.equal(await page.getByPlaceholder('Wert').first().getAttribute('inputmode'),'numeric');
+    assert.equal(await page.getByPlaceholder('Wert').first().getAttribute('pattern'),'[0-9]*');
     const first = () => page.locator('.card').first();
     const score = () => first().locator('.score').innerText();
     await first().getByRole('button',{name:'Plus 1',exact:true}).click();
@@ -104,6 +106,31 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
         if ([820,834,1180,1194,1280].includes(width)) assert.ok(metrics.scrollHeight <= height + 1,`Vertical overflow ${width}×${height}, ${count} players: ${metrics.scrollHeight}`);
         samples.push({count,...metrics});
         if ([834,1194].includes(width) && [2,4,8].includes(count)) await page.screenshot({path:`test-results/${width}x${height}-${count}-players.png`,fullPage:true});
+        // The results must use the available screen, with a chart that resizes to its panel.
+        const resultData = fixture(count);
+        resultData.log = [Object.fromEntries(resultData.players.map(p => [p.id,0])),Object.fromEntries(resultData.players.map(p => [p.id,p.score]))];
+        await page.evaluate(data => localStorage.setItem('punktestand-v1',JSON.stringify(data)),resultData);
+        await page.reload();
+        await page.getByRole('button',{name:'Neue Runde',exact:true}).click();
+        await page.waitForFunction(() => {
+          const box = document.querySelector('.result-chart'), svg = box.querySelector('svg');
+          return svg && Math.abs(svg.viewBox.baseVal.width - box.clientWidth) <= 1 && Math.abs(svg.viewBox.baseVal.height - box.clientHeight) <= 1;
+        });
+        const resultMetrics = await page.locator('.sheet').evaluate(el => {
+          const rect = el.getBoundingClientRect(), chart = el.querySelector('.chart').getBoundingClientRect();
+          return {width:rect.width,height:rect.height,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,chartWidth:chart.width,chartHeight:chart.height,
+            actionsVisible:[...el.querySelectorAll('.acts button')].every(b => {const r=b.getBoundingClientRect();return r.top >= 0 && r.bottom <= innerHeight;})};
+        });
+        assert.ok(resultMetrics.scrollWidth <= resultMetrics.clientWidth + 1,`Result overflow ${width}×${height}, ${count} players`);
+        if (width >= 700) {
+          assert.equal(resultMetrics.width,width);
+          assert.equal(resultMetrics.height,height);
+          assert.equal(resultMetrics.actionsVisible,true);
+          assert.ok(resultMetrics.chartWidth > 200 && resultMetrics.chartHeight >= 200);
+        }
+        samples[samples.length - 1].result = resultMetrics;
+        if ([390,834,1194,1920].includes(width) && [2,8].includes(count)) await page.screenshot({path:`test-results/result-${width}x${height}-${count}-players.png`,fullPage:true});
+        await page.keyboard.press('Escape');
       }
     }
     // Dark mode and unusually long, valid scores.
@@ -114,7 +141,19 @@ const fixture = count => ({mode:'low', players:Array.from({length:count}, (_,i) 
     assert.equal(await first().locator('.score').evaluate(el => el.scrollWidth > el.clientWidth + 1),false);
     assert.deepEqual(errors,[]);
     require('node:fs').writeFileSync('test-results/layout.json',JSON.stringify(samples,null,2));
-    console.log(`OK: functions, keyboard focus, persistence, validation, ${samples.length} layouts.`);
+    // Resizing/rotating with results open must update the chart without reopening.
+    await page.locator('.card').last().getByRole('button',{name:'Plus 1',exact:true}).click();
+    await page.getByRole('button',{name:'Neue Runde',exact:true}).click();
+    for (const size of [{width:834,height:1194},{width:1194,height:834},{width:390,height:844}]) {
+      await page.setViewportSize(size);
+      await page.waitForFunction(() => {
+        const box = document.querySelector('.result-chart'), svg = box.querySelector('svg');
+        return svg && Math.abs(svg.viewBox.baseVal.width - box.clientWidth) <= 1 && Math.abs(svg.viewBox.baseVal.height - box.clientHeight) <= 1;
+      });
+    }
+    await page.keyboard.press('Escape');
+    assert.deepEqual(errors,[]);
+    console.log(`OK: functions, keyboard focus, persistence, validation, ${samples.length} game and result layouts, result resizing.`);
   } catch(error) {
     mkdirSync('test-results',{recursive:true});
     await page.screenshot({path:'test-results/failure.png',fullPage:true});
