@@ -16,6 +16,7 @@ Danach veröffentlicht GitHub Änderungen auf `main` automatisch. Die vorgesehen
 ## Bedienung
 
 - Spieler direkt umbenennen, mit **+ / −** zählen oder einen eigenen Betrag anwenden.
+- Zahlenfelder öffnen auf Smartphones und Tablets den Ziffernblock; der Betrag besteht aus Ziffern, das Vorzeichen wird über **+ / −** gewählt.
 - **Zurück** nimmt die letzte Punkteänderung bzw. das Hinzufügen/Entfernen eines Spielers zurück.
 - **Neue Runde** zeigt Ergebnis und Punkteverlauf; erst **Neue Runde starten** setzt Punkte zurück.
 - Niedrigste oder höchste Punktzahl gewinnt; Hell-/Dunkelmodus und Vollbild werden unterstützt, soweit der Browser dies anbietet.
@@ -26,9 +27,11 @@ Spielstände bleiben ausschließlich im `localStorage` des jeweiligen Browsers. 
 
 Ab 700 CSS-Pixeln werden Karten und Bedienelemente an die Spielerzahl angepasst. Ab 1000 Pixeln passen drei Karten nebeneinander; ab 1100 Pixeln werden bei 7–8 Spielern vier Spalten verwendet. Die Fläche ist bis 1800 Pixel breit nutzbar. Punktzahlen skalieren mit ihrer Kartenbreite und Stellenzahl. Es wird nach dem tatsächlich verfügbaren Browserbereich entschieden, nicht nach Gerätebezeichnungen.
 
+Die Auswertung nach **Neue Runde** nutzt ab 700 Pixeln die volle Browserbreite und -höhe. Endstand und Punkteverlauf stehen nebeneinander; das Diagramm passt sich auch beim Drehen oder Ändern der Fenstergröße an seine Fläche an. Die Rundenschaltflächen bleiben am unteren Rand erreichbar. Auf Smartphones bleibt die kompakte, scrollbar dargestellte Auswertung erhalten.
+
 ## Prüfung
 
-Der GitHub-Actions-Workflow prüft Bedienung, Speicherung, fehlerhafte Daten, Tastaturfokus und 63 Layout-Kombinationen einschließlich 820×1180, 834×1194, der jeweiligen Querformate und 1280×800. Screenshots und Messwerte liegen nach einem erfolgreichen Lauf im Actions-Artefakt `tablet-pruefung`.
+Der GitHub-Actions-Workflow prüft Bedienung, Speicherung, fehlerhafte Daten, Tastaturfokus sowie Spielansicht und Auswertung in jeweils 63 Layout-Kombinationen einschließlich 820×1180, 834×1194, der jeweiligen Querformate und 1280×800. Auch die Diagrammanpassung bei geöffneter Auswertung wird geprüft. Screenshots und Messwerte liegen nach einem erfolgreichen Lauf im Actions-Artefakt `tablet-pruefung`. Die tatsächlich angezeigte Bildschirmtastatur muss ergänzend auf iOS/Android geprüft werden.
 
 Lokal mit Node.js 24:
 
