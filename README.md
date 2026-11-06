@@ -42,3 +42,9 @@ node tests/browser.cjs
 ```
 
 Produktiv wird ausschließlich `index.html` benötigt. Weitere Prüfergebnisse und mögliche Folgeschritte stehen in [CODE_REVIEW.md](CODE_REVIEW.md).
+
+## Mitwirkende
+
+[<img src="https://avatars.githubusercontent.com/u/267193182?s=64&v=4" width="32" height="32" alt="Codex-Profilbild">](https://github.com/codex)
+
+[Codex](https://github.com/codex) hat zu diesem Projekt beigetragen.
